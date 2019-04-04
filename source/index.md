@@ -1,7 +1,5 @@
 # Заметки
 
-Здесь присутствуют очевидные вещи, не претендующие на творчество,
-и описывается архитектура, сделанная на коленке.
-
-* [Про TDD](tdd.md)
-* [Как не перекомпилировать Js](do-not-recompile.md)
+* [Зачем нужно TDD](what-is-tdd-for.md)
+* [Ссылка из статичного front на back](url-from-static-front-to-back.md)
+* [`reload!` в `rails c`](rails-reload.md)

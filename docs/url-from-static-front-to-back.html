@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>do-not-recompile</title>
+  <title>url-from-static-front-to-back</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -17,8 +17,10 @@
   <![endif]-->
 </head>
 <body>
-<h1 id="как-не-перекомпилировать-js">Как не перекомпилировать JS</h1>
-<p>Предположим есть приложение состоящее из двух частей <em>Front</em> и <em>Back</em>. <em>Front</em> часть должна знать URL <em>Back</em> части. При этом <em>Front</em> статичная часть. Как передать туда URL <em>Back</em> части без перекомпиляции?</p>
+<h1 id="ссылка-из-статичного-фронта-на-бэк">Ссылка из статичного фронта на бэк</h1>
+<p>Предположим есть приложение состоящее из двух частей: <em>Front</em> и <em>Back</em>.</p>
+<p><em>Front</em> - чистый js, статика, должен знать URL <em>Back</em> части.</p>
+<p>Как передать туда URL <em>Back</em> части без перекомпиляции?</p>
 <p>Поставьте перед вашим приложением proxy сервер и настройте проксирование на <em>Back</em> по отдельному пути.</p>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -67,5 +69,6 @@
 </svg>
 
 <p>В таком случае, во <em>Front</em> части достаточно написать только относительный путь, например <code>/back</code>, запрос уйдёт на прокси сервер, а потом на <em>Back</em>.</p>
+<p><a href="index.html">Назад</a></p>
 </body>
 </html>
