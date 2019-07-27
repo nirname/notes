@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #ffffff; color: #1f1c1b; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #ffffff; color: #a0a0a0; border-right: 1px solid #a0a0a0; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #1f1c1b; background-color: #ffffff; }
+code > span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code > span.dt { color: #0057ae; } /* DataType */
+code > span.dv { color: #b08000; } /* DecVal */
+code > span.bn { color: #b08000; } /* BaseN */
+code > span.fl { color: #b08000; } /* Float */
+code > span.cn { color: #aa5500; } /* Constant */
+code > span.ch { color: #924c9d; } /* Char */
+code > span.sc { color: #3daee9; } /* SpecialChar */
+code > span.st { color: #bf0303; } /* String */
+code > span.vs { color: #bf0303; } /* VerbatimString */
+code > span.ss { color: #ff5500; } /* SpecialString */
+code > span.im { color: #ff5500; } /* Import */
+code > span.co { color: #898887; } /* Comment */
+code > span.do { color: #607880; } /* Documentation */
+code > span.an { color: #ca60ca; } /* Annotation */
+code > span.cv { color: #0095ff; } /* CommentVar */
+code > span.ot { color: #006e28; } /* Other */
+code > span.fu { color: #644a9b; } /* Function */
+code > span.va { color: #0057ae; } /* Variable */
+code > span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #1f1c1b; } /* Operator */
+code > span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code > span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code > span.pp { color: #006e28; } /* Preprocessor */
+code > span.at { color: #0057ae; } /* Attribute */
+code > span.re { color: #0057ae; } /* RegionMarker */
+code > span.in { color: #b08000; } /* Information */
+code > span.wa { color: #bf0303; } /* Warning */
+code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
+code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code > span. { color: #1f1c1b; } /* Normal */
+  </style>
+  <link rel="stylesheet" href="github-markdown.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="cookie-sharing">Cookie sharing</h1>
+<p>Кука устанавливается для определённого домена.</p>
+<p>Одни и те же cookie можно использовать для домена и его поддоменов.</p>
+<p>Выдержка из <a href="https://stackoverflow.com/a/23086139/4175647">ответа на stackoverflow</a></p>
+<blockquote>
+<p>Согласно стандарту, In RFC 2109 домен без лидирущий точки означает, что кука не может быть использована на поддоменах. и только домет с лидирущей точкой позволяет использовать одни и теже куки на поддоменах Согласно более новой спецификации RFC 6265, лидирующая точка игнорируется, и куки для домена без точки может быть использована на поддоменах.</p>
+</blockquote>
+<p>Однако, невзирая на новую спецификацию, кука без точки по разным причинам может игнорироваться поддоменами.</p>
+<p>Допустим, вы хотите поменять домен для куки на существующем проекте Rails и разрешить его использование на поддоменах. Для этого нужно указать <code>domain: :all</code> явно:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.signed[<span class="st">:user_id</span>] = { <span class="st">value: </span>user.id, <span class="st">domain: :all</span> }</code></pre></div>
+<p>Не забудьте указать домен при удалении куки:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)</code></pre></div>
+<p>Дальше — сложности. В браузере будет 2 куки, одна для домена с точкой, другая для домена без. Поэтому удалять их надо обе. Например, если они отвечают за аутентификацию, пользователь не сможет выйти с сайта. Однако rails не удалит куку с одним и тем же именем дважды, поэтому конструкция вида:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)
+cookies.delete(<span class="st">:user_id</span>)</code></pre></div>
+<p>не поможет.</p>
+<p>Если пользователей много, то объяснять им, что &quot;вам надо почистить куки&quot; бесполезно. Что делать? Либо дописывать Rails, либо использовать <del>грязный трюк</del> двойной redirect:</p>
+<div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">def</span> logout
+  cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)
+  redirect_to logout_domain_path
+<span class="kw">end</span>
+
+<span class="kw">def</span> logout_domain
+  cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: </span><span class="dv">nil</span>)
+  redirect_to root_path
+<span class="kw">end</span></code></pre></div>
+</body>
+</html>
