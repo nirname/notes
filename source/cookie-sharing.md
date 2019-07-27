@@ -52,3 +52,5 @@ def logout_domain
   redirect_to root_path
 end
 ```
+
+[Назад](index.md)

@@ -9,3 +9,5 @@
   reload!
   m.is_a? MyModel # false
 ```
+
+[Назад](index.md)
