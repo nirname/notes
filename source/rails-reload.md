@@ -1,3 +1,5 @@
+[На главную](index.md)
+
 # `reload!` в `rails c`
 
 Создаём новый проект `rails` и делаем модель `MyModel`.
@@ -10,4 +12,4 @@
   m.is_a? MyModel # false
 ```
 
-[Назад](index.md)
+[На главную](index.md)

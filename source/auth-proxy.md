@@ -1,3 +1,5 @@
+[На главную](index.md)
+
 # Авторизационный proxy
 
 ## Как авторизовывать несколько сервисов без написания кучи кода внутри них
@@ -55,8 +57,12 @@ https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subreques
 
 https://doc.traefik.io/traefik/middlewares/http/forwardauth/
 
+WIP
+
 ## Как узнать в целевом сервисе что за пользователь к нам пришёл?
 
 Эту информацию можно передать через заголовки.
 
-[Назад](index.md)
+WIP
+
+[На главную](index.md)
