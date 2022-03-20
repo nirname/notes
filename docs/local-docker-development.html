@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #ffffff; color: #1f1c1b; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #ffffff; color: #a0a0a0; border-right: 1px solid #a0a0a0; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #1f1c1b; background-color: #ffffff; }
+code > span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code > span.dt { color: #0057ae; } /* DataType */
+code > span.dv { color: #b08000; } /* DecVal */
+code > span.bn { color: #b08000; } /* BaseN */
+code > span.fl { color: #b08000; } /* Float */
+code > span.cn { color: #aa5500; } /* Constant */
+code > span.ch { color: #924c9d; } /* Char */
+code > span.sc { color: #3daee9; } /* SpecialChar */
+code > span.st { color: #bf0303; } /* String */
+code > span.vs { color: #bf0303; } /* VerbatimString */
+code > span.ss { color: #ff5500; } /* SpecialString */
+code > span.im { color: #ff5500; } /* Import */
+code > span.co { color: #898887; } /* Comment */
+code > span.do { color: #607880; } /* Documentation */
+code > span.an { color: #ca60ca; } /* Annotation */
+code > span.cv { color: #0095ff; } /* CommentVar */
+code > span.ot { color: #006e28; } /* Other */
+code > span.fu { color: #644a9b; } /* Function */
+code > span.va { color: #0057ae; } /* Variable */
+code > span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #1f1c1b; } /* Operator */
+code > span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code > span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code > span.pp { color: #006e28; } /* Preprocessor */
+code > span.at { color: #0057ae; } /* Attribute */
+code > span.re { color: #0057ae; } /* RegionMarker */
+code > span.in { color: #b08000; } /* Information */
+code > span.wa { color: #bf0303; } /* Warning */
+code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
+code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code > span. { color: #1f1c1b; } /* Normal */
+  </style>
+  <link rel="stylesheet" href="github-markdown.css" type="text/css" />
+</head>
+<body>
+<h1 id="сложности-локальной-разработки-в-docker">Сложности локальной разработки в Docker</h1>
+<p>Предположим у нас есть приложение в каталоге <code>front</code>. Локальная разработка в Docker подразумевает, что вы запускаете ваше приложение внутри контейнера, например так:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">cd</span> front
+<span class="ex">docker</span> run --rm -it -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>:/app -w /app -e TOKEN=12345 -p 3000:3000 node:14 sh -c <span class="st">&quot;yarn install &amp;&amp; yarn start&quot;</span></code></pre></div>
+<p>Команда запуска, сокращается при использовании <code>docker-compose</code>. Тут ничего нового. Создадим каталог <code>start</code> на одном уровне с <code>front</code>, положим туда <code>docker-compose.yml</code>:</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3.9&quot;</span>
+<span class="fu">services:</span>
+  <span class="fu">front:</span>
+    <span class="fu">image:</span><span class="at"> node:14</span>
+    <span class="fu">working_dir:</span><span class="at"> </span><span class="st">&quot;/app&quot;</span>
+    <span class="fu">command:</span><span class="at"> sh -c &quot;yarn install &amp;&amp; yarn start&quot;</span>
+    <span class="fu">volumes:</span>
+      <span class="kw">-</span> <span class="fu">../front:</span><span class="at">/app</span>
+    <span class="fu">ports:</span>
+      <span class="kw">-</span> <span class="st">&quot;3000:3000&quot;</span>
+    <span class="fu">environment:</span>
+      <span class="kw">-</span> TOKEN=12345</code></pre></div>
+<p>Теперь команда для запуска выглядит так:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker-compose</span> up</code></pre></div>
+<p>Запустились, открываем <code>localhost:3000</code>. И вот какие проблемы вы встретите.</p>
+<h2 id="слушать-все-входящие-соединения">Слушать все входящие соединения</h2>
+<p>Многие приложения по умолчанию слушают только <code>localhost</code>, а <code>localhost</code> внутри контейнера это не тот же самый, который на вашей локальной машине.</p>
+<p>Пример: не забывайте указывать <code>-b 0.0.0.0</code> при запуске Rails.</p>
+<h2 id="сохранение-данных-между-контейнерами">Сохранение данных между контейнерами</h2>
+<p>TLDR: сделать volume. Дальше разжёвываем почему.</p>
+<p>Когда вы запустили команду, то всё что она сделает произойдёт внутри контейнера и результат её работы останется там же.</p>
+<p>В случае с <code>yarn</code> или <code>npm</code> результатом работы команды будет каталог <code>node_modules</code>, который находится, как правило, в каталоге с проектом (<code>front</code> в нашем примере). Поэтому когда в следующий раз вы запустите:</p>
+<pre><code>docker-compose run --rm front yarn install</code></pre>
+<p>у вашего front приложения уже будут установлены модули только потому, что в <code>docker-compose.yml</code> написано:</p>
+<pre><code>volumes:
+  - ../front:/app</code></pre>
+<p>Это означает что вы смонтировали ваш локальный каталог внутрь проекта, и <code>node_moduldes</code> сохранилось в вашей файловой системе, а не внутри контейнера.</p>
+<p>Но не все команды так работают. Например <code>bundle install</code> по умолчанию сохранит <code>gem</code>-ы <strong>вне</strong> директории проекта. Куда именно — зависит от настроек, но в любом случае, если удалится контейнер, с ним удалятся и установленные библиотеки.</p>
+<p>Поэтому чтобы эти данные сохранялись между запусками разных контейнеров, в них нужно монтировать <code>volume</code> (либо каталог с локальной машины, либо <code>docker-volume</code>)</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3.9&quot;</span>
+<span class="fu">services:</span>
+  <span class="fu">back:</span>
+    <span class="fu">build:</span>
+      <span class="fu">context:</span><span class="at"> ../back</span>
+      <span class="fu">dockerfile:</span><span class="at"> Dockerfile.dev</span>
+    <span class="fu">command:</span><span class="at"> sh -c &quot;bundle exec rails s -p 3000 -b &#39;0.0.0.0&#39;&quot;</span>
+    <span class="fu">volumes:</span>
+      <span class="kw">-</span> <span class="fu">../back:</span><span class="at">/app</span>
+      <span class="kw">-</span> <span class="fu">bundle-data:</span><span class="at">/usr/local/bundle</span>
+<span class="fu">volumes:</span>
+  <span class="fu">bundle-data:</span></code></pre></div>
+<p>То же самое относится ко всему что имеет состояние, например к базам данных:</p>
+<div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3.9&quot;</span>
+<span class="fu">services:</span>
+  <span class="fu">db:</span>
+    <span class="fu">image:</span><span class="at"> postgres:13.4</span>
+    <span class="fu">volumes:</span>
+      <span class="kw">-</span> <span class="fu">pg-data:</span><span class="at">/var/lib/postgresql/data</span>
+    <span class="fu">environment:</span>
+      <span class="fu">PGDATA:</span><span class="at"> /var/lib/postgresql/data</span>
+      <span class="fu">POSTGRES_PASSWORD:</span><span class="at"> </span><span class="st">&quot;postgres&quot;</span>
+<span class="fu">volumes:</span>
+  <span class="fu">pg-data:</span></code></pre></div>
+<h2 id="запуск-команд-внутри-контейнеров">Запуск команд внутри контейнеров</h2>
+<p>Теперь ваш <code>yarn</code> или любые другие утилиты не утсановлены локально, а только внутри контейнера. Чтобы выполнить любую команду, например <code>yarn</code>, вам нужно сказать что-то в духе:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker-compose</span> run --rm front yarn add и-тут-что-хочу</code></pre></div>
+<p>Понятно, что это крайне неудобно. Как выйти из положения?</p>
+<p>Есть <a href="https://github.com/bibendi/dip">gem <code>dip</code></a> который адресует эти вопросы. Но опять же, это <code>gem</code> который подразумевает дополнительную установку.</p>
+<p>Я предпочитаю написать простой bash script <code>cli</code> следующего вида:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="co">#!/bin/bash</span>
+
+<span class="va">command=$1</span>
+<span class="va">arguments=${@:2}</span>
+<span class="va">container=$2</span>
+<span class="va">rest=${@:3}</span>
+
+<span class="kw">case</span> <span class="va">$command</span><span class="kw"> in</span>
+
+up <span class="kw">|</span> start <span class="kw">|</span> stop <span class="kw">|</span> down <span class="kw">|</span> build<span class="kw">)</span>
+<span class="ex">docker-compose</span> <span class="va">$command</span> <span class="va">$arguments</span>
+<span class="kw">;;</span>
+
+rails <span class="kw">|</span> rake <span class="kw">|</span> bundle<span class="kw">)</span>
+<span class="ex">docker-compose</span> run --rm back <span class="va">$command</span> <span class="va">$arguments</span>
+<span class="kw">;;</span>
+
+yarn <span class="kw">|</span> npm<span class="kw">)</span>
+<span class="ex">docker-compose</span> run --rm front <span class="va">$command</span> <span class="va">$arguments</span>
+<span class="kw">;;</span>
+
+help<span class="kw">)</span>
+
+<span class="fu">cat</span> <span class="op">&lt;&lt;EOF</span>
+This is help:
+
+<span class="va">$0</span> up              # Launch everything
+...
+EOF
+
+;;
+
+*)
+<span class="va">$0</span> help
+;;
+
+esac</code></pre></div>
+<h2 id="права-доступа">Права доступа</h2>
+<p>в процессе написания...</p>
+</body>
+</html>

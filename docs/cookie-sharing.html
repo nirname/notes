@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="pandoc">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
   <title></title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
@@ -46,29 +46,37 @@ code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
 code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
 code > span. { color: #1f1c1b; } /* Normal */
   </style>
-  <link rel="stylesheet" href="github-markdown.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
+  <link rel="stylesheet" href="github-markdown.css" type="text/css" />
 </head>
 <body>
 <h1 id="cookie-sharing">Cookie sharing</h1>
-<p>Кука устанавливается для определённого домена.</p>
-<p>Одни и те же cookie можно использовать для домена и его поддоменов.</p>
-<p>Выдержка из <a href="https://stackoverflow.com/a/23086139/4175647">ответа на stackoverflow</a></p>
+<h2 id="теория">Теория</h2>
+<p>Cookie - это заголовок, который браузер отправляет автоматически вместе с каждым запросом. Cookie устанавливаются для определённого домена. Соответственно, и отправятся они на тот домен для которого установлены.</p>
+<p>Однако одни и те же Cookie можно использовать для домена и его поддоменов. Для того, чтобы такое стало возможным, Cookie нужно установить для домена с лидирующей точкой. Например <code>example.com</code> будет отправляться только на <code>example.com</code>. А <code>.example.com</code> будет отправляться и на <code>subdomain.example.com</code> в том числе.</p>
+<p>Здесь есть нюансы (выдержка из <a href="https://stackoverflow.com/a/23086139/4175647">ответа на stackoverflow</a>):</p>
 <blockquote>
 <p>Согласно стандарту, In RFC 2109 домен без лидирущий точки означает, что кука не может быть использована на поддоменах. и только домет с лидирущей точкой позволяет использовать одни и теже куки на поддоменах Согласно более новой спецификации RFC 6265, лидирующая точка игнорируется, и куки для домена без точки может быть использована на поддоменах.</p>
 </blockquote>
-<p>Однако, невзирая на новую спецификацию, кука без точки по разным причинам может игнорироваться поддоменами.</p>
-<p>Допустим, вы хотите поменять домен для куки на существующем проекте Rails и разрешить его использование на поддоменах. Для этого нужно указать <code>domain: :all</code> явно:</p>
+<p>Невзирая на новую спецификацию, кука без точки по разным причинам может игнорироваться поддоменами.</p>
+<p>При этом домены <code>.example.com</code> и <code>example.com</code> не эквиваленты. То есть вы можете получить в браузере сразу 2 Cookie, одну для домена с точкой, другую для домена без.</p>
+<h2 id="к-практике">К практике</h2>
+<p>Допустим, если вы хотите разрешить использовать одну и ту же Cookie для поддоменов в проекте Rails. Для этого нужно указать <code>domain: :all</code> явно:</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.signed[<span class="st">:user_id</span>] = { <span class="st">value: </span>user.id, <span class="st">domain: :all</span> }</code></pre></div>
+<p>Это будет эквивалентно установке <code>user_id</code> для домена <code>.example.com</code>. (Разумеется, это будет тот домен, на котором размещён проект)</p>
 <p>Не забудьте указать домен при удалении куки:</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)</code></pre></div>
-<p>Дальше — сложности. В браузере будет 2 куки, одна для домена с точкой, другая для домена без. Поэтому удалять их надо обе. Например, если они отвечают за аутентификацию, пользователь не сможет выйти с сайта. Однако rails не удалит куку с одним и тем же именем дважды, поэтому конструкция вида:</p>
+<p>Дальше — сложности. Если это был уже существующий проект, и вы ранее полагались на Cookie только для основного домена, то в браузере теперь будут 2 записи, (да, одна для домена с точкой, другая для домена без).</p>
+<p>Поэтому удалять их надо обе.</p>
+<p>Например, если они отвечают за аутентификацию, пользователь не сможет выйти с сайта. Однако Rails не удалит куку с одним и тем же именем дважды, если вы последовательно вызовете 2 строчки кода. (так написан исходный код Rails, по крайней мере в 5й версии).</p>
+<p>То есть конструкция видаЖ</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby">cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)
 cookies.delete(<span class="st">:user_id</span>)</code></pre></div>
 <p>не поможет.</p>
-<p>Если пользователей много, то объяснять им, что &quot;вам надо почистить куки&quot; бесполезно. Что делать? Либо дописывать Rails, либо использовать <del>грязный трюк</del> двойной redirect:</p>
+<p>Если пользователей много, то объяснять им, что &quot;вам надо почистить куки&quot; бесполезно. Что делать?</p>
+<h3 id="вариант-а"><del>Вариант А</del></h3>
+<p><del>Переименовать cookie и всех разлогинить</del></p>
+<h3 id="вариант-б">Вариант Б</h3>
+<p>Использовать <del>грязный трюк</del> двойной redirect:</p>
 <div class="sourceCode"><pre class="sourceCode ruby"><code class="sourceCode ruby"><span class="kw">def</span> logout
   cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: :all</span>)
   redirect_to logout_domain_path
@@ -78,6 +86,8 @@ cookies.delete(<span class="st">:user_id</span>)</code></pre></div>
   cookies.delete(<span class="st">:user_id</span>, <span class="st">domain: </span><span class="dv">nil</span>)
   redirect_to root_path
 <span class="kw">end</span></code></pre></div>
+<h3 id="вариант-в">Вариант В</h3>
+<p>Дописать Rails, возможно это до сих пор не исправлено.</p>
 <p><a href="index.html">Назад</a></p>
 </body>
 </html>
