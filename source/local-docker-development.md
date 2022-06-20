@@ -12,7 +12,6 @@ docker run --rm -it -v $(pwd):/app -w /app -e TOKEN=12345 -p 3000:3000 node:14 s
 ```
 
 Команда запуска, сокращается при использовании `docker-compose`.
-Тут ничего нового.
 Создадим каталог `start` на одном уровне с `front`,
 положим туда `docker-compose.yml`:
 
@@ -31,9 +30,18 @@ services:
       - TOKEN=12345
 ```
 
-Теперь команда для запуска выглядит так:
+Теперь структура проектов выглядит так:
+
+```
+projects/
+  front/
+  launcher/
+```
+
+А команда для запуска выглядит так:
 
 ```bash
+cd launcher/
 docker-compose up
 ```
 

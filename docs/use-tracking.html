@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #ffffff; color: #1f1c1b; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #ffffff; color: #a0a0a0; border-right: 1px solid #a0a0a0; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #1f1c1b; background-color: #ffffff; }
+code > span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code > span.dt { color: #0057ae; } /* DataType */
+code > span.dv { color: #b08000; } /* DecVal */
+code > span.bn { color: #b08000; } /* BaseN */
+code > span.fl { color: #b08000; } /* Float */
+code > span.cn { color: #aa5500; } /* Constant */
+code > span.ch { color: #924c9d; } /* Char */
+code > span.sc { color: #3daee9; } /* SpecialChar */
+code > span.st { color: #bf0303; } /* String */
+code > span.vs { color: #bf0303; } /* VerbatimString */
+code > span.ss { color: #ff5500; } /* SpecialString */
+code > span.im { color: #ff5500; } /* Import */
+code > span.co { color: #898887; } /* Comment */
+code > span.do { color: #607880; } /* Documentation */
+code > span.an { color: #ca60ca; } /* Annotation */
+code > span.cv { color: #0095ff; } /* CommentVar */
+code > span.ot { color: #006e28; } /* Other */
+code > span.fu { color: #644a9b; } /* Function */
+code > span.va { color: #0057ae; } /* Variable */
+code > span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #1f1c1b; } /* Operator */
+code > span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code > span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code > span.pp { color: #006e28; } /* Preprocessor */
+code > span.at { color: #0057ae; } /* Attribute */
+code > span.re { color: #0057ae; } /* RegionMarker */
+code > span.in { color: #b08000; } /* Information */
+code > span.wa { color: #bf0303; } /* Warning */
+code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
+code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code > span. { color: #1f1c1b; } /* Normal */
+  </style>
+  <link rel="stylesheet" href="github-markdown.css" type="text/css" />
+</head>
+<body>
+<p>GTM + SPA hook</p>
+<div class="sourceCode"><pre class="sourceCode js"><code class="sourceCode javascript"><span class="im">import</span> <span class="op">{</span> useEffect <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;react&#39;</span><span class="op">;</span>
+<span class="im">import</span> <span class="op">{</span> useLocation <span class="op">}</span> <span class="im">from</span> <span class="st">&#39;react-router-dom&#39;</span><span class="op">;</span>
+
+<span class="kw">const</span> useTracking <span class="op">=</span> () <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> location <span class="op">=</span> <span class="at">useLocation</span>()<span class="op">;</span>
+
+  <span class="at">useEffect</span>(() <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="kw">const</span> unlisten <span class="op">=</span> () <span class="op">=&gt;</span> <span class="op">{</span>
+      <span class="cf">if</span> (<span class="op">!</span><span class="va">window</span>.<span class="at">dataLayer</span>) <span class="cf">return</span><span class="op">;</span>
+      <span class="va">window</span>.<span class="va">dataLayer</span>.<span class="at">push</span>(<span class="op">{</span>
+        <span class="dt">event</span><span class="op">:</span> <span class="st">&#39;pageview&#39;</span><span class="op">,</span>
+        <span class="dt">page</span><span class="op">:</span> <span class="op">{</span>
+          <span class="dt">path</span><span class="op">:</span> <span class="va">location</span>.<span class="at">pathname</span><span class="op">,</span>
+        <span class="op">},</span>
+      <span class="op">}</span>)<span class="op">;</span>
+    <span class="op">};</span>
+    <span class="cf">return</span> unlisten<span class="op">;</span>
+  <span class="op">},</span> [location])<span class="op">;</span>
+<span class="op">};</span>
+
+<span class="im">export</span> <span class="im">default</span> useTracking<span class="op">;</span></code></pre></div>
+</body>
+</html>
