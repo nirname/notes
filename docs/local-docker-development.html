@@ -54,7 +54,7 @@ code > span. { color: #1f1c1b; } /* Normal */
 <p>Предположим у нас есть приложение в каталоге <code>front</code>. Локальная разработка в Docker подразумевает, что вы запускаете ваше приложение внутри контейнера, например так:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">cd</span> front
 <span class="ex">docker</span> run --rm -it -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>:/app -w /app -e TOKEN=12345 -p 3000:3000 node:14 sh -c <span class="st">&quot;yarn install &amp;&amp; yarn start&quot;</span></code></pre></div>
-<p>Команда запуска, сокращается при использовании <code>docker-compose</code>. Тут ничего нового. Создадим каталог <code>start</code> на одном уровне с <code>front</code>, положим туда <code>docker-compose.yml</code>:</p>
+<p>Команда запуска, сокращается при использовании <code>docker-compose</code>. Создадим каталог <code>start</code> на одном уровне с <code>front</code>, положим туда <code>docker-compose.yml</code>:</p>
 <div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3.9&quot;</span>
 <span class="fu">services:</span>
   <span class="fu">front:</span>
@@ -67,8 +67,13 @@ code > span. { color: #1f1c1b; } /* Normal */
       <span class="kw">-</span> <span class="st">&quot;3000:3000&quot;</span>
     <span class="fu">environment:</span>
       <span class="kw">-</span> TOKEN=12345</code></pre></div>
-<p>Теперь команда для запуска выглядит так:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">docker-compose</span> up</code></pre></div>
+<p>Теперь структура проектов выглядит так:</p>
+<pre><code>projects/
+  front/
+  launcher/</code></pre>
+<p>А команда для запуска выглядит так:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">cd</span> launcher/
+<span class="ex">docker-compose</span> up</code></pre></div>
 <p>Запустились, открываем <code>localhost:3000</code>. И вот какие проблемы вы встретите.</p>
 <h2 id="слушать-все-входящие-соединения">Слушать все входящие соединения</h2>
 <p>Многие приложения по умолчанию слушают только <code>localhost</code>, а <code>localhost</code> внутри контейнера это не тот же самый, который на вашей локальной машине.</p>
