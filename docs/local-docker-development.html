@@ -50,11 +50,18 @@ code > span. { color: #1f1c1b; } /* Normal */
 </head>
 <body>
 <p><a href="index.html">На главную</a></p>
-<h1 id="сложности-локальной-разработки-в-docker">Сложности локальной разработки в Docker</h1>
-<p>Предположим у нас есть приложение в каталоге <code>front</code>. Локальная разработка в Docker подразумевает, что вы запускаете ваше приложение внутри контейнера, например так:</p>
+<h1 id="локальная-разработка-в-docker">Локальная разработка в Docker</h1>
+<p>Предположим, что вы храните части своего веб-сайта в <code>project</code>. Примерная структура каталогов будет выглядеть так.</p>
+<pre><code>project/
+  front/
+  back/</code></pre>
+<p>Локальная разработка в Docker подразумевает, что вы запускаете ваше приложение внутри контейнеров, например так:</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">cd</span> front
 <span class="ex">docker</span> run --rm -it -v <span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span>:/app -w /app -e TOKEN=12345 -p 3000:3000 node:14 sh -c <span class="st">&quot;yarn install &amp;&amp; yarn start&quot;</span></code></pre></div>
-<p>Команда запуска, сокращается при использовании <code>docker-compose</code>. Создадим каталог <code>start</code> на одном уровне с <code>front</code>, положим туда <code>docker-compose.yml</code>:</p>
+<p>Мы просто взяли образ <code>node:14</code> и запустили внутри команду <code>yarn install &amp;&amp; yarn start</code>. Наше фронт-приложение попало внутрь докер-контейнера в каталог <code>/app</code>, и мы предполагаем, и оно будет доступно на <code>3000</code> порту.</p>
+<h2 id="создаём-скрипты-для-запуска">Создаём скрипты для запуска</h2>
+<p>Команда запуска в докер слишком длинная. Её можно записать в <code>run.sh</code> файл, и положить внутри <code>front</code>. Но лучше её сократить при помощи <code>docker-compose</code>. Создадим каталог <code>launcher</code> прямо в <code>project</code>, на одном уровне со всеми остальными приложениями. В нём мы будем хранить все скрипты по запуску приложения.</p>
+<p>Положим туда <code>docker-compose.yml</code>:</p>
 <div class="sourceCode"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span class="fu">version:</span><span class="at"> </span><span class="st">&quot;3.9&quot;</span>
 <span class="fu">services:</span>
   <span class="fu">front:</span>
