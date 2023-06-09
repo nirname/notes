@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-docker run --rm -it -e SOURCE_DIR=/local/source TARGET_DIR=/app/docs -v $(pwd):/local nirname/documentary $@
+docker run --rm -it -e SOURCE_DIR=/local/source -e TARGET_DIR=/app/docs -v $(pwd):/local nirname/documentary $@
 echo "programming.technology" > ./docs/CNAME
