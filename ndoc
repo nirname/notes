@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-docker run --rm -it -e SOURCE_DIR=/local/source -e TARGET_DIR=/app/docs -v $(pwd):/local nirname/documentary $@
-echo "programming.technology" > ./docs/CNAME
+docker run --rm -it --env-file nenv -v $(pwd):/local nirname/documentary $@
