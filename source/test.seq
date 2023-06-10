@@ -1,7 +1,0 @@
-seqdiag {
-  browser => proxy [label = "app.example.com"] {
-    proxy -> example.com [label = "auth request"];
-    proxy <-- example.com [label = "200"];
-    proxy => app.example.com;
-  }
-}

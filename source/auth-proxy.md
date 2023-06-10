@@ -47,6 +47,7 @@ seqdiag {
   browser -> proxy -> example.com [label = "example.com/login"];
 }
 ```
+
 ## Что писать на прокси сервере?
 
 У nginx есть соответсвующий модуль

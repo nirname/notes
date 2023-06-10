@@ -14,7 +14,7 @@ body {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   color: #333;
-  /*overflow: hidden;*/
+  /* font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif; */
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -37,6 +37,7 @@ body strong {
 body h1 {
   font-size: 2em;
   margin: 0.67em 0;
+  text-align: center;
 }
 
 body img {
@@ -291,14 +292,12 @@ body h1 {
   padding-bottom: 0.3em;
   font-size: 2.25em;
   line-height: 1.2;
-  border-bottom: 1px solid #eee;
 }
 
 body h2 {
   padding-bottom: 0.3em;
   font-size: 1.75em;
   line-height: 1.225;
-  border-bottom: 1px solid #eee;
 }
 
 body h3 {
@@ -373,10 +372,35 @@ body dl dd {
   margin-bottom: 16px;
 }
 
-body blockquote {
-  padding: 0 15px;
-  color: #777;
-  border-left: 4px solid #ddd;
+/* Style blockquotes */
+blockquote {
+  background-color: #f8f8f8;
+  border-left: 6px solid #ccc;
+  padding: 10px 20px;
+  margin: 30px 0; /* Increase margin top and bottom */
+  font-size: 1.2em; /* Increase font size */
+  font-style: italic; /* Make the rest of the content italic */
+}
+
+blockquote:before {
+  content: "\201C"; /* Unicode left double quotation mark */
+  font-size: 2em;
+  line-height: 0.1em;
+  vertical-align: -0.4em;
+  margin-right: 5px;
+  font-style: normal; /* Remove italic from the opening quotation mark */
+}
+
+blockquote:after {
+  font-size: 2em;
+  line-height: 0.1em;
+  vertical-align: -0.4em;
+  margin-left: 5px;
+}
+
+
+blockquote p {
+  display: inline;
 }
 
 body blockquote>:first-child {
@@ -414,28 +438,11 @@ body table tr:nth-child(2n) {
   background-color: #f8f8f8;
 }
 
+body img,
 body svg {
-  /* max-width: 100%; */
-  /* -moz-box-sizing: border-box;
-  box-sizing: border-box; */
-
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 20px auto;
 }
-
-body svg {
-  /* position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); */
-}
-
-/* body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
 
 body code {
   padding: 0;
